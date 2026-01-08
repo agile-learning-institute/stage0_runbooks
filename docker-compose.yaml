@@ -1,0 +1,48 @@
+services:
+  ##################################
+  # Stage0 Runbook API Service
+  ##################################
+  api:
+    image: ghcr.io/agile-learning-institute/stage0_runbook_api:latest
+    container_name: stage0_runbook_api
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      API_PORT: 8083
+      RUNBOOKS_DIR: /workspace/runbooks
+      ENABLE_LOGIN: "true"
+      LOGGING_LEVEL: "INFO"
+    volumes:
+      - ./runbooks:/workspace/runbooks:ro
+    working_dir: /workspace/runbooks
+    command: runbook serve --runbooks-dir /workspace/runbooks --port 8083
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/runbooks"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  ##################################
+  # Stage0 Runbook SPA Service
+  ##################################
+  spa:
+    image: ghcr.io/agile-learning-institute/stage0_runbook_spa:latest
+    container_name: stage0_runbook_spa
+    restart: unless-stopped
+    ports:
+      - "8084:80"
+    environment:
+      API_HOST: api
+      API_PORT: 8083
+    depends_on:
+      api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
