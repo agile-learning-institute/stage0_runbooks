@@ -2,7 +2,7 @@
 
 <img src="./runbook.png" alt="Runbook" width="30%">
 
-A simple way to organize your automation scripts, manage quality, and make them easy to find and use across your DevOps team. Document manual processes, automated scripts, or mix both—all in version-controlled markdown files. Implemented as a [micro-service api](https://github.com/agile-learning-institute/stage0_runbook_api), with a [single-page web app](https://github.com/agile-learning-institute/stage0_runbook_spa) UI.
+A simple way to organize your automation scripts, manage quality, and make them easy to find and use across your DevOps team. Document manual processes, automated scripts, or mix both—all in version-controlled markdown files. Implemented as a [micro-service api](https://github.com/agile-learning-institute/stage0_runbook_api), with a [single-page web app](https://github.com/agile-learning-institute/stage0_runbook_spa) UI and soon to be a [MCP Server](https://github.com/agile-learning-institute/stage0_runbook_api/issues/6) so you can integrate managed automations into LLM work flows.
 
 ## Quick Look Around
 
