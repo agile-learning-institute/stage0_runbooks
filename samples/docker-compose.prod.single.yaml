@@ -1,0 +1,78 @@
+# Production Docker Compose - Single Instance
+# Best for: Small to medium deployments, single-server setups
+#
+# Usage:
+#   1. Create runbooks directory: mkdir -p runbooks
+#   2. Copy runbooks to the directory
+#   3. Set environment variables (use secrets manager):
+#      export JWT_SECRET=$(openssl rand -hex 32)
+#      export JWT_ISSUER="your-idp"
+#      export JWT_AUDIENCE="runbook-api"
+#   4. Start services: docker-compose -f samples/docker-compose.prod.single.yaml up -d
+#   5. Verify health: curl http://localhost:8083/metrics
+
+services:
+  api:
+    image: ghcr.io/agile-learning-institute/stage0_runbook_api:latest
+    restart: always
+    ports:
+      - "127.0.0.1:8083:8083"  # Only expose to localhost, use reverse proxy
+    environment:
+      # Required Configuration
+      API_PORT: 8083
+      RUNBOOKS_DIR: /workspace/runbooks
+      ENABLE_LOGIN: "false"  # MUST be false in production
+      JWT_SECRET: "${JWT_SECRET}"  # From secrets manager
+      JWT_ISSUER: "your-identity-provider"
+      JWT_AUDIENCE: "runbook-api-production"
+      
+      # Recommended Configuration
+      LOGGING_LEVEL: "WARNING"
+      SCRIPT_TIMEOUT_SECONDS: "600"
+      MAX_OUTPUT_SIZE_BYTES: "10485760"
+      RATE_LIMIT_ENABLED: "true"
+      RATE_LIMIT_PER_MINUTE: "60"
+      RATE_LIMIT_EXECUTE_PER_MINUTE: "10"
+      RATE_LIMIT_STORAGE_BACKEND: "memory"  # Use "redis" for multi-instance
+      
+      # Optional: Redis for distributed rate limiting
+      # REDIS_URL: "redis://redis:6379/0"
+    volumes:
+      - ./runbooks:/workspace/runbooks:ro  # Read-only mount
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Redis for distributed rate limiting
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: always
+  #   volumes:
+  #     - redis-data:/data
+  #   command: redis-server --appendonly yes
+
+  spa:
+    image: ghcr.io/agile-learning-institute/stage0_runbook_spa:latest
+    restart: always
+    ports:
+      - "127.0.0.1:8084:80"  # Only expose to localhost
+    environment:
+      API_HOST: api
+      API_PORT: 8083
+    depends_on:
+      api:
+        condition: service_healthy
+
+# volumes:
+#   redis-data:

@@ -1,0 +1,91 @@
+# Kubernetes Deployment for Stage0 Runbook API
+# Best for: Cloud-native deployments, orchestrated environments
+#
+# Usage:
+#   1. Create namespace: kubectl create namespace runbooks
+#   2. Create secrets: kubectl create secret generic runbook-secrets --from-literal=jwt-secret=$(openssl rand -hex 32) -n runbooks
+#   3. Create ConfigMap with runbooks: kubectl create configmap runbooks-config --from-file=runbooks/ -n runbooks
+#   4. Apply deployment: kubectl apply -f samples/k8s/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stage0-runbook-api
+  namespace: runbooks
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: stage0-runbook-api
+  template:
+    metadata:
+      labels:
+        app: stage0-runbook-api
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/agile-learning-institute/stage0_runbook_api:latest
+        ports:
+        - containerPort: 8083
+        env:
+        - name: API_PORT
+          value: "8083"
+        - name: RUNBOOKS_DIR
+          value: "/workspace/runbooks"
+        - name: ENABLE_LOGIN
+          value: "false"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: runbook-secrets
+              key: jwt-secret
+        - name: JWT_ISSUER
+          value: "your-identity-provider"
+        - name: JWT_AUDIENCE
+          value: "runbook-api-production"
+        - name: RATE_LIMIT_ENABLED
+          value: "true"
+        - name: RATE_LIMIT_STORAGE_BACKEND
+          value: "redis"
+        - name: REDIS_URL
+          value: "redis://redis-service:6379/0"
+        volumeMounts:
+        - name: runbooks
+          mountPath: /workspace/runbooks
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8083
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8083
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      - name: runbooks
+        configMap:
+          name: runbooks-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stage0-runbook-api
+  namespace: runbooks
+spec:
+  selector:
+    app: stage0-runbook-api
+  ports:
+  - port: 80
+    targetPort: 8083
+  type: ClusterIP

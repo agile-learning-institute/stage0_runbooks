@@ -1,0 +1,59 @@
+# Prometheus alerting rules for Stage0 Runbook API
+#
+# Usage:
+#   1. Place this file in your Prometheus rules directory (e.g., /etc/prometheus/rules/)
+#   2. Reference it in prometheus.yml:
+#      rule_files:
+#        - "prometheus-alerts.yml"
+#   3. Reload Prometheus: promtool check rules prometheus-alerts.yml && killall -HUP prometheus
+#
+# Adjust thresholds based on your SLOs and requirements
+
+groups:
+  - name: stage0_runbook_api
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: rate(flask_http_request_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected in Stage0 Runbook API"
+          description: "Error rate is {{ $value }} errors/second (threshold: 0.1)"
+          
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, flask_http_request_duration_seconds_bucket) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "95th percentile response time > 2s"
+          description: "95th percentile response time is {{ $value }}s"
+          
+      - alert: ServiceDown
+        expr: up{job="stage0-runbook-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Stage0 Runbook API service is down"
+          description: "The API service has been down for more than 1 minute"
+          
+      - alert: HighRateLimitHits
+        expr: rate(flask_http_request_total{status="429"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High rate limit hits detected"
+          description: "Rate limit hits: {{ $value }} per second (threshold: 10)"
+          
+      - alert: High4xxErrorRate
+        expr: rate(flask_http_request_total{status=~"4.."}[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 4xx error rate detected"
+          description: "4xx error rate is {{ $value }} errors/second (threshold: 0.5)"

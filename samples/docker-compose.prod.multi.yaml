@@ -1,0 +1,62 @@
+# Production Docker Compose - Multi-Instance with Load Balancer
+# Best for: High availability, horizontal scaling
+#
+# Usage:
+#   1. Copy nginx.conf to your deployment directory
+#   2. Set up SSL certificates in ./ssl/ directory
+#   3. Set environment variables (use secrets manager)
+#   4. Start services: docker-compose -f samples/docker-compose.prod.multi.yaml up -d
+
+services:
+  api:
+    image: ghcr.io/agile-learning-institute/stage0_runbook_api:latest
+    restart: always
+    deploy:
+      replicas: 3  # Run 3 instances
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    environment:
+      API_PORT: 8083
+      RUNBOOKS_DIR: /workspace/runbooks
+      ENABLE_LOGIN: "false"
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_ISSUER: "your-identity-provider"
+      JWT_AUDIENCE: "runbook-api-production"
+      RATE_LIMIT_ENABLED: "true"
+      RATE_LIMIT_STORAGE_BACKEND: "redis"  # Required for multi-instance
+      REDIS_URL: "redis://redis:6379/0"
+    volumes:
+      - ./runbooks:/workspace/runbooks:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # TLS certificates
+    depends_on:
+      - api
+
+volumes:
+  redis-data:

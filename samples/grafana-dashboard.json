@@ -1,0 +1,62 @@
+{
+  "dashboard": {
+    "title": "Stage0 Runbook API",
+    "tags": ["stage0", "runbook", "api"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Request Rate",
+        "targets": [
+          {
+            "expr": "rate(flask_http_request_total[5m])",
+            "legendFormat": "{{method}} {{status}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Error Rate",
+        "targets": [
+          {
+            "expr": "rate(flask_http_request_total{status=~\"[45]..\"}[5m])",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Response Time (p95)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, flask_http_request_duration_seconds_bucket)",
+            "legendFormat": "p95"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Active Workers",
+        "targets": [
+          {
+            "expr": "gunicorn_workers",
+            "legendFormat": "Workers"
+          }
+        ],
+        "type": "stat"
+      },
+      {
+        "title": "Rate Limit Hits",
+        "targets": [
+          {
+            "expr": "rate(flask_http_request_total{status=\"429\"}[5m])",
+            "legendFormat": "Rate Limited"
+          }
+        ],
+        "type": "graph"
+      }
+    ],
+    "refresh": "10s",
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

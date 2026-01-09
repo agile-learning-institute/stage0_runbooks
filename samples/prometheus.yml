@@ -1,0 +1,28 @@
+# Prometheus configuration for scraping Stage0 Runbook API metrics
+# 
+# Usage:
+#   1. Place this file in your Prometheus configuration directory
+#   2. Update targets to match your API deployment
+#   3. Reload Prometheus: promtool check config prometheus.yml && killall -HUP prometheus
+#
+# For authentication, uncomment and configure the bearer_token or basic_auth section
+
+scrape_configs:
+  - job_name: 'stage0-runbook-api'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ['api:8083']  # Update to match your API hostname
+    metrics_path: '/metrics'
+    
+    # Optional: Add authentication
+    # bearer_token: 'your-token'
+    # basic_auth:
+    #   username: 'prometheus'
+    #   password: 'your-password'
+    
+    # Optional: Add labels
+    # relabel_configs:
+    #   - source_labels: [__address__]
+    #     target_label: instance
+    #     replacement: 'stage0-runbook-api'
