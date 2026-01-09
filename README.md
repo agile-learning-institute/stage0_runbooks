@@ -1,11 +1,8 @@
 # Stage0 Runbook System
 
-<div style="display: flex; align-items: center; gap: 20px;">
-  <img src="./runbook.png" alt="Runbook" style="width: 50%; max-width: 500px; flex-shrink: 0;">
-  <div style="flex: 1;">
-    A simple way to organize your automation scripts, manage quality, and make them easy to find and use across your DevOps team. Document manual processes, automated scripts, or mix both—all in version-controlled markdown files. Implemented as a [micro-service api](https://github.com/agile-learning-institute/stage0_runbook_api), with a [single-page web app](https://github.com/agile-learning-institute/stage0_runbook_spa) UI.
-  </div>
-</div>
+<img src="./runbook.png" alt="Runbook" width="30%">
+
+A simple way to organize your automation scripts, manage quality, and make them easy to find and use across your DevOps team. Document manual processes, automated scripts, or mix both—all in version-controlled markdown files. Implemented as a [micro-service api](https://github.com/agile-learning-institute/stage0_runbook_api), with a [single-page web app](https://github.com/agile-learning-institute/stage0_runbook_spa) UI.
 
 ## Quick Look Around
 
