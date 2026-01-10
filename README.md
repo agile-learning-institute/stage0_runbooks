@@ -26,7 +26,7 @@ Runbooks are markdown files that organize your operational procedures. Each runb
 - **Requirements** - Environment variables, files, or permissions needed
 - **History** - Automatic log of who ran it and when
 
-You can write runbooks for fully automated scripts, document manual procedures, or combine both—the runbook just provides structure and makes everything easy to find and securely to execute.
+You can write runbooks for fully automated scripts, document manual procedures, or combine both—the runbook just provides structure and makes everything easy to find and securely execute.
 
 ## Quick Start
 
