@@ -9,10 +9,14 @@ A simple way to organize your automation scripts, manage quality, and make them 
 Want to see it in action? Download [docker-compose.yaml](./docker-compose.yaml) and run:
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
-Then open [http://localhost:8084](http://localhost:8084) in your browser. There are a couple example runbooks to explore.
+Then open [http://localhost:8084](http://localhost:8084) in your browser. There are a couple example runbooks to explore. When you're done looking around, you can shutdown the service with 
+
+```bash
+docker compose down
+```
 
 ## What Are Runbooks?
 
@@ -22,7 +26,7 @@ Runbooks are markdown files that organize your operational procedures. Each runb
 - **Requirements** - Environment variables, files, or permissions needed
 - **History** - Automatic log of who ran it and when
 
-You can write runbooks for fully automated scripts, document manual procedures, or combine both—the runbook just provides structure and makes everything easy to find.
+You can write runbooks for fully automated scripts, document manual procedures, or combine both—the runbook just provides structure and makes everything easy to find and securely to execute.
 
 ## Quick Start
 
