@@ -39,7 +39,7 @@ You can write runbooks for fully automated scripts, document manual procedures, 
 That's it. See [SRE.md](./SRE.md) for customization options like adding CLI tools (AWS, GitHub, etc.) to your container.
 
 ## Need More Details?
-
+- **Join us on Discord**: [Runbooks Support Channel](https://discord.gg/Pcs8yTXPuh)
 - **Technical setup and customization**: [SRE.md](./SRE.md)
 - **Runbook format specification**: [Runbook Format](https://github.com/agile-learning-institute/stage0_runbook_api/blob/main/RUNBOOK.md)
 - **API documentation**: http://localhost:8083/docs/explorer.html (when running)
