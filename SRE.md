@@ -13,7 +13,9 @@ Technical documentation for Site Reliability Engineers deploying and customizing
 
 ## Architecture Overview
 
-The Stage0 Runbook System is a containerized application designed for small DevOps teams (~20 users) with sporadic usage patterns.
+<img src="./runbook.svg" alt="Runbook" width="100%">
+
+The Stage0 Runbook System is a Containerized Configuration as Code application designed for small DevOps teams (~20 users) with sporadic usage patterns.
 
 ### Components
 
