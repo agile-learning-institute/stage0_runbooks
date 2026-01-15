@@ -13,6 +13,7 @@ services:
       RUNBOOKS_DIR: ./runbooks
       ENABLE_LOGIN: "true"
       LOGGING_LEVEL: "INFO"
+      JWT_SECRET: ${JWT_SECRET:-}
     working_dir: /opt/stage0/runner
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8083/metrics')"]
@@ -33,6 +34,7 @@ services:
     environment:
       API_HOST: api
       API_PORT: 8083
+      IDP_LOGIN_URI: http://localhost:8084/login
     depends_on:
       api:
         condition: service_healthy

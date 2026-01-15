@@ -75,7 +75,7 @@ The [Template docker-compose.yaml](https://github.com/agile-learning-institute/s
 
 | Variable | Description | Production Requirement |
 |----------|-------------|------------------------|
-| `JWT_SECRET` | JWT signing secret | Generate strong secret: `openssl rand -hex 32` |
+| `JWT_SECRET` | JWT signing secret | **REQUIRED**: Must be explicitly set. Application will fail to start if default value is used. Generate strong secret: `openssl rand -hex 32` or `python3 -c "import secrets; print(secrets.token_urlsafe(32))"` |
 | `JWT_ISSUER` | Expected JWT issuer claim | Match your identity provider |
 | `JWT_AUDIENCE` | Expected JWT audience claim | Match your identity provider |
 | `ENABLE_LOGIN` | Development login endpoint | **MUST be `false` in production** |
@@ -126,9 +126,6 @@ When executing or validating a runbook:
 | `RUNBOOKS_DIR` | `./samples/runbooks` | Set to packaged runbook location |
 | `LOGGING_LEVEL` | `INFO` | `WARNING` or `ERROR` to reduce log volume |
 | `JWT_TTL_MINUTES` | `480` | Adjust based on your security policy |
-| `RATE_LIMIT_ENABLED` | `true` | Keep enabled |
-| `RATE_LIMIT_PER_MINUTE` | `60` | Default is sufficient for small teams |
-| `RATE_LIMIT_EXECUTE_PER_MINUTE` | `10` | Default is sufficient for small teams |
 | `SCRIPT_TIMEOUT_SECONDS` | `600` | Adjust based on longest-running runbook |
 | `MAX_OUTPUT_SIZE_BYTES` | `10485760` | Default 10MB is usually sufficient |
 
@@ -138,6 +135,7 @@ When executing or validating a runbook:
 |----------|---------|-------------|
 | `API_HOST` | `api` | Hostname of API service (matches docker-compose service name) |
 | `API_PORT` | `8083` | Port of API service |
+| `IDP_LOGIN_URI` | `http://localhost:8084/login` | Full URI for IdP login redirect. For dev, use `/login` (dev login page). For production, use your external IdP URL (e.g., `https://idp.example.com/login`) |
 
 ### Sample Production Deployment
 
@@ -184,20 +182,17 @@ YYYY-MM-DD HH:MM:SS - LEVEL - logger_name - message
   - Authentication failures
   - RBAC failures
   - Script execution failures
-  - Rate limit hits
 
 **Important Log Patterns**:
 - `RBAC failure` - Unauthorized access attempts
 - `Script execution timed out` - Long-running script
 - `Invalid environment variable name` - Input validation failures
-- `Rate limit exceeded` - Rate limiting triggered
 
 ### Alerting
 
 See [samples/prometheus-alerts.yml](samples/prometheus-alerts.yml) for Prometheus alerting rules including:
 - High error rate detection
 - Service down detection
-- Rate limit hit monitoring
 
 ## Troubleshooting
 
